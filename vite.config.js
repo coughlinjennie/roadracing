@@ -5,16 +5,15 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  base: '/starter-plot-repo/',
+  base: '/roadracing/',
   build: {
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        interactive: resolve(__dirname, 'interactive/index.html'),
-        growing: resolve(__dirname, 'growing/index.html'),
-        snowing: resolve(__dirname, 'snowing/index.html'),
-        'stained-glass': resolve(__dirname, 'stained-glass/index.html'),
-        scrollytelly: resolve(__dirname, 'scrollytelly/index.html'),
+        c25k: resolve(__dirname, 'c25k/index.html'),
+        corrals: resolve(__dirname, 'corrals/index.html'),
+        paces: resolve(__dirname, 'paces/index.html'),
+        details: resolve(__dirname, 'details/index.html'),
       },
     },
   },
