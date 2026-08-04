@@ -14,6 +14,10 @@ const steps = [
     data: [
       { label: '<60 <13:45',  value: 162265 },
       { label: '<60 13:45+', value:  10079 },
+    ],
+  },
+  {
+    data: [
       { label: '60+ <13:45',  value: 9492 },
       { label: '60+ 13:45+', value:  2525 },
     ],
