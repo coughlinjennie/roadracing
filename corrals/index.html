@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scrollytelly</title>
+  <link rel="stylesheet" href="../main.css">
+  <style>
+    .scrolly-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .sticky-graphic {
+      position: sticky;
+      top: 20vh;
+      flex: 0 0 400px;
+    }
+
+    #d3-scrolly {
+      width: 400px;
+      height: 360px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      overflow: visible;
+    }
+
+    #d3-scrolly .tick text {
+      fill: #eee;
+      font-size: 12px;
+    }
+    #d3-scrolly .domain,
+    #d3-scrolly .tick line {
+      stroke: rgba(255, 255, 255, 0.3);
+    }
+
+    .steps {
+      flex: 1;
+      padding: 0 1rem;
+    }
+
+    .step {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 4rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: border-color 0.3s;
+    }
+
+    .step.is-active {
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .step p {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #eee;
+    }
+
+    .spacer {
+      height: 20vh;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Scrollytelly</h1>
+    <div class="main-body">
+      <div class="scrolly-container">
+        <div class="sticky-graphic">
+          <svg id="d3-scrolly"></svg>
+        </div>
+        <div class="steps">
+          <div class="spacer"></div>
+
+          <div class="step" data-step="0">
+            <p>Here is our starting point: a small survey of favorite fruits.</p>
+          </div>
+
+          <div class="step" data-step="1">
+            <p>A week later we collected more responses. Banana is catching up.</p>
+          </div>
+
+          <div class="step" data-step="2">
+            <p>By the end of the month, Mango had a surprise surge.</p>
+          </div>
+
+          <div class="step" data-step="3">
+            <p>Final results. Every fruit grew — but Mango took the crown.</p>
+          </div>
+
+          <div class="spacer"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="scrollytelly.js"></script>
+</body>
+</html>
