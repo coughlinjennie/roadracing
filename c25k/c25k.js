@@ -2,42 +2,40 @@ import * as d3 from 'd3';
 import scrollama from 'scrollama';
 import '../main.css';
 
-// ─── STEPS ────────────────────────────────────────────────────────────────────
-// Each step has a `text` shown in the scroll panel and a `data` array of
-// { label, value } objects that drive the bar chart.
-// Edit these to use your own data — add/remove steps or change the numbers.
-// ──────────────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────────
 const steps = [
   {
     data: [
-      { label: 'Apple',  value: 12 },
-      { label: 'Banana', value:  5 },
-      { label: 'Cherry', value:  8 },
-      { label: 'Mango',  value:  3 },
+      { label: 'Sub-30',  value: 66357 },
+      { label: '30+', value:  57869 },
     ],
   },
   {
     data: [
-      { label: 'Apple',  value: 18 },
-      { label: 'Banana', value: 14 },
-      { label: 'Cherry', value:  9 },
-      { label: 'Mango',  value:  6 },
+      { label: 'Women Sub-30',  value: 24607 },
+      { label: 'Women 30+', value: 37004 },
+      { label: 'Men Sub-30', value:  41519 },
+      { label: 'Men 30+',  value:  20621 },
     ],
   },
   {
     data: [
-      { label: 'Apple',  value: 20 },
-      { label: 'Banana', value: 16 },
-      { label: 'Cherry', value: 10 },
-      { label: 'Mango',  value: 22 },
+      { label: 'Sub-35',  value: 93652 },
+      { label: '35+', value:  30574 },
     ],
   },
   {
     data: [
-      { label: 'Apple',  value: 25 },
-      { label: 'Banana', value: 20 },
-      { label: 'Cherry', value: 14 },
-      { label: 'Mango',  value: 30 },
+      { label: 'Women Sub-35',  value: 41330 },
+      { label: 'Women 35+', value: 20281 },
+      { label: 'Men Sub-35', value:  51977 },
+      { label: 'Men 35+',  value:  10163 },
+    ],
+  },
+  {
+    data: [
+      { label: 'Sub-50',  value: 118799 },
+      { label: '50+', value:  5427 },
     ],
   },
 ];

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scrollytelly</title>
+  <title>Start Corrals</title>
   <link rel="stylesheet" href="../main.css">
   <style>
     .scrolly-container {
@@ -29,7 +29,7 @@
     }
 
     #d3-scrolly .tick text {
-      fill: #eee;
+      fill: #080707;
       font-size: 12px;
     }
     #d3-scrolly .domain,
@@ -61,7 +61,7 @@
     .step p {
       font-size: 1rem;
       line-height: 1.6;
-      color: #eee;
+      color: #080707;
     }
 
     .spacer {
@@ -71,7 +71,18 @@
 </head>
 <body>
   <main>
-    <h1>Scrollytelly</h1>
+     <nav class="page-nav">
+       <a href="../c25k/">Couch to 5K</a>
+        <a href="../corrals/">Start Corrals</a>
+        <a href="../paces/">Paces</a>
+        <a href="../details/">About the Data</a>
+        <a href="/allrunners/">Return to Home</a>
+      </nav>
+    <h1>Start Line Organization Bunches Up Slow Runners</h1>
+    <p>The larger the race, the more organization is required at the starting line. A small community race might just ask slower runners to start toward the back, while major marathons have waves and corrals seeded by expected finishing time or qualifying time. Because NYRR serves the largest city in the United States, even its smaller races have 3,000 to 5,000 runners, so it has a standard starting corral structure for weekly races. NYRR uses a “best pace,” which is set using the NYRR race result in the previous two years that equates to the fastest 10K race pace.</p>
+    <p> </p>
+    <p>The corrals are AA through L, with corrals AA and A having slightly different thresholds depending on gender. Here, we’re going to collapse those two corrals into a single AA/A group since the cutoff between A and B corrals is the first one that is the same no matter what gender the participant registered as. The median 10K pace of 9:30 lands in the middle of Corral I, which means half the finishes in the field are placed in fewer than four of 13 corrals</p>
+    <div class="spacer"></div>
     <div class="main-body">
       <div class="scrolly-container">
         <div class="sticky-graphic">
@@ -81,26 +92,36 @@
           <div class="spacer"></div>
 
           <div class="step" data-step="0">
-            <p>Here is our starting point: a small survey of favorite fruits.</p>
+            <p>Corral L contains all runners with a best pace between 11:37 and 25:00, a pace range larger than the range of Corrals AA through K (4:00 to 11:36). Even that doesn’t fully incorporate the NYRR road racers, as actual race results include races completed with paces up to 27:50. The L corral actually has a slightly slower threshold than it did at one point. The cutoff between Corrals K and L used to be 11:30. In each slower corral, more runners are placed there, with significantly more in the final corral than in the earlier ones — almost 20 percent of the 10K finishes in the data. In a typical weekly race, which has a field size of 3,000 to 8,000 participants, that puts between 585 and 1,560 runners in Corral L. If the point of corrals is to ensure that runners are placed with people of roughly similar paces, placing almost 20 percent of runners into a single corral that has a range of paces that stretches more than 13 minutes/mile seems counterproductive.</p>
+            
           </div>
 
           <div class="step" data-step="1">
-            <p>A week later we collected more responses. Banana is catching up.</p>
+            <p>The total field divided by the numbers of corrals suggests between 8 and 8.5 percent would be in each, which would work out to between 240 and 680 runners in a corral in a weekly race. When we divide up the field so the corrals are equal in size, the pace ranges still put a larger pace range in L than in all the other corrals combined, but it's closer than it had been. While not visible here, the median pace of finishes also lands right at the break between Corrals F and G, which is the midpoint in the start corral structure as well. That’s still a big range of paces in the final corral, but there at least are fewer people crammed in there. </p>
           </div>
 
           <div class="step" data-step="2">
-            <p>By the end of the month, Mango had a surprise surge.</p>
+            <p>One solution that might address both the front and back of the race field is to keep the 6:29 cutoff for AA/A, and add Corrals M and N at the end. That still means the final corral includes a range of paces greater than 14:30 from fastest to slowest, but with 7.69 percent of runners in each corral, a weekly race would put 230 to 615 runners in each corral, including the final one, reducing the bunching at the back of the field. </p>
           </div>
 
-          <div class="step" data-step="3">
-            <p>Final results. Every fruit grew — but Mango took the crown.</p>
-          </div>
+          <!-- <div class="step" data-step="4">
+            <p>If we go to 50 minutes, which is just above the high outlier threshold, that captures the bulk of the finishes. A beginner running program that was designed to allow most people who complete it to finish a 5K would provide training up to 50 minutes, with off-ramps for faster runners to take when they were ready to run a 5K road race. </p>
+          </div> -->
 
           <div class="spacer"></div>
+
         </div>
       </div>
     </div>
+      <nav class="page-nav">
+        <a href="../c25k/">Couch to 5K</a>
+        <a href="../corrals/">Start Corrals</a>
+        <a href="../paces/">Paces</a>
+        <a href="../details/">About the Data</a>
+        <a href="/allrunners/">Return to Home</a>
+      </nav>
   </main>
-  <script type="module" src="scrollytelly.js"></script>
+</body>  
+  <script type="module" src="corrals.js"></script>
 </body>
 </html>

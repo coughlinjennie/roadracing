@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scrollytelly</title>
+  <title>Paces and Training</title>
   <link rel="stylesheet" href="../main.css">
   <style>
     .scrolly-container {
@@ -29,7 +29,7 @@
     }
 
     #d3-scrolly .tick text {
-      fill: #eee;
+      fill: #080707;
       font-size: 12px;
     }
     #d3-scrolly .domain,
@@ -61,7 +61,7 @@
     .step p {
       font-size: 1rem;
       line-height: 1.6;
-      color: #eee;
+      color: #080707;
     }
 
     .spacer {
@@ -71,7 +71,18 @@
 </head>
 <body>
   <main>
-    <h1>Scrollytelly</h1>
+     <nav class="page-nav">
+        <a href="../c25k/">Couch to 5K</a>
+        <a href="../corrals/">Start Corrals</a>
+        <a href="../paces/">Paces</a>
+        <a href="../details/">About the Data</a>
+        <a href="/allrunners/">Return to Home</a>
+      </nav>
+    <h1>Pace Expectations Vs. Finishes</h1>
+    <p>Course time limits can vary widely, but the idea that 13:45 is a standard for what constitutes running does have some value, as 3:00 — the amount of time it takes to run 13.1 miles at 13:45 pace — is a common half-marathon time limit and many training plans for various distances top out with paces in that range.</p>
+    <p> </p>
+    <p>Likewise, that translates to a 6:00 marathon, and many marathons have 6:00 or 6:30 as a cutoff. The NYRR data set doesn’t include half-marathon data, but since pace tends to slow with longer distances, looking at the paces road racers are competing at for shorter distances should, if anything, underestimate how many people are excluded by the 13:45 standard.</p> 
+    <div class="spacer"></div>
     <div class="main-body">
       <div class="scrolly-container">
         <div class="sticky-graphic">
@@ -81,26 +92,35 @@
           <div class="spacer"></div>
 
           <div class="step" data-step="0">
-            <p>Here is our starting point: a small survey of favorite fruits.</p>
+            <p>Across all the distances, more than 30,000 finishes were at paces slower than 13:45/mile, slightly more than 7 percent of the field.</p>
           </div>
 
           <div class="step" data-step="1">
-            <p>A week later we collected more responses. Banana is catching up.</p>
+            <p>The older age groups have a larger share of participants finishing in slower than 13:45 pace, most notably for the road racers 80 and older, but all age groups have people who finish at paces much slower than 13:45.</p>
           </div>
 
           <div class="step" data-step="2">
-            <p>By the end of the month, Mango had a surprise surge.</p>
+            <p>When we look just at finishes by runners 60 and older, we also see there are more men than women. That might reflect the greater opportunuties for people in this age bracket to try the sport in school, as many of the runners in this age group graduated high school before Title IX had equalized opportunities for women.</p>
           </div>
 
-          <div class="step" data-step="3">
-            <p>Final results. Every fruit grew — but Mango took the crown.</p>
-          </div>
+          <!-- <div class="step" data-step="3">
+            <p>One thing we haven't looked at yet is how Athletes with Disabilities (AWD) fit into the picture. While race registrations don't show AWD status, the Achilles 4M race has more AWD than most races, so is a good point of comparison. When we consider the 13:45 pace threshold, a larger share of Achilles race finishes are slower than that compared to all races: 10.7 percent vs. 7.3 percent. As with older road race participants, the current industry standards are more likely to exclude participants with disabilities.</p>
+          </div> -->
 
           <div class="spacer"></div>
+
         </div>
       </div>
     </div>
+      <nav class="page-nav">
+       <a href="../c25k/">Couch to 5K</a>
+        <a href="../corrals/">Start Corrals</a>
+        <a href="../paces/">Paces</a>
+        <a href="../details/">About the Data</a>
+        <a href="/allrunners/">Return to Home</a>
+      </nav>
   </main>
-  <script type="module" src="scrollytelly.js"></script>
+</body>  
+  <script type="module" src="c25K.js"></script>
 </body>
 </html>
