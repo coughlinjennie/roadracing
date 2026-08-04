@@ -2,7 +2,6 @@ import * as d3 from 'd3';
 import scrollama from 'scrollama';
 import '../main.css';
 
-──────────────────────────────────────────────────────────────────────────
 const steps = [
   {
     data: [
