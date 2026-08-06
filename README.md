@@ -4,7 +4,7 @@ This is my capstone project for my M.S. in Data Analysis and Data Visualization 
 
 The Scrape folder has the scripts and instructions needed to scrape the NYRR race results site
 The Data folder has a CSV file of the processed race results data and can be used to replicate the results of my analysis
-The Analysis folder has the R notebooks detailing data cleanup and the subsequent analysis that underlies the website. 
+The Analysis folder has the R notebooks detailing data cleanup and the subsequent analysis that underlies the website, as well as a PDF of the project whitepaper.
 
 The findings are presented on the website, in three sections: c25k, corrals and paces. Details is the section showing the public-facing description of the data. 
 
