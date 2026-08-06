@@ -1,9 +1,11 @@
-#Set Up
+# Scraping NYRR Race Results Data
+
+## Set Up
 
 The Scrape folder has all the scripts needed to scrape individual race results from https://results.nyrr.org/home 
 Each page of race results has 51 finishers. The race page will state how many finishers there are. Within the Scripts folder are scripts for each results page, up to 28K finishers. 
 
-#Scraping a Race's Results
+## Scraping a Race's Results
 
 For the race you want to scrape, get the race code from the URL of the results page. Example: https://results.nyrr.org/event/26SLSM/finishers uses 26SLSM as the race code. 
 Open however many of the Scripts files you need in a text editor. In lines 18 and 83, replace the code with the one for the race you're scraping. Multi-file find and replace is your friend here. Save and close them. 
@@ -15,7 +17,7 @@ Run that, which will create a single csv file with all the results for that race
 
 If you want to append them to the data included here, you'll need to open the CSV file and make some changes first. I used Google Sheets, so will include those instructions, but you can use whatever tool you prefer. 
 
-#Data Processing
+## Data Processing
 
 Format the finishing time as duration in seconds
 Check for missing data

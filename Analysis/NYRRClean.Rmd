@@ -1,0 +1,78 @@
+---
+title: "NYRR Data CLeaning"
+output: html_notebook
+---
+
+First, I need to clean the dataset
+```{r}
+View(NYRRmaster)
+warnings(NYRRmaster)
+```
+
+One race was appended with the name field still attached. When I look at that race, it also looks like it was misclassified as a half. I'm removing it completely, which I can do by excluding the files that have a value in the Name field. 
+
+```{r}
+nyrrRaces <- NYRRmaster %>% dplyr::filter(is.na(Name))
+```
+
+```{r}
+summary(nyrrRaces)
+```
+
+I also need to kill the now-empty Name column
+
+```{r}
+nyrrNoname = select(nyrrRaces, -Name)
+```
+
+
+I also need to drop the files with an NA in Age and Gender categories, which are people running anonymously. Typically, these are celebrities, like Chelsea Clinton, where having their name in race results would be a security issue. It could also include somebody who isn't a public figure but has security concerns. 
+
+```{r}
+library(tidyr)
+NYRR <- nyrrNoname %>% drop_na('Age')
+```
+
+```{r}
+summary(NYRR)
+```
+```{r}
+install.packages('plyr')
+library(plyr)
+```
+
+When I did my initial EDA, there was one outlier that was either a data error or an unusual case where the finisher's pace was more than 3 hours/mile, so I'm excluding that. 
+```{r}
+nyrr <- subset(NYRR, Pace != 11089)
+```
+
+```{r}
+
+summary(nyrr)
+```
+The other thing I discovered in my EDA is that the Half data didn't all compile, so I'm removing that from this analysis. 
+
+```{r}
+nyrrShort <- nyrr[!grepl("Half", nyrr$Distance), ]
+```
+
+```{r}
+summary(nyrrShort)
+```
+
+
+That takes the dataset down to 459,812 files. To make life simpler, I'm going to export this dataframe to CSV so the clean data is accesssible to others and so I don't have to repeat these steps in the future. 
+
+
+```{r}
+# Install and load the package
+install.packages("tidyverse")
+library(tidyverse)
+
+# Save a data frame as a CSV file
+write_csv(nyrr, "Documents/Repositories/roadracing/Data/nyrr.csv")
+```
+
+
+
+

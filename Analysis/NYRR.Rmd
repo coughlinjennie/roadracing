@@ -1,0 +1,605 @@
+---
+title: "NYRR Shorter Races"
+output: html_notebook
+---
+
+```{r}
+# Library
+library(ggplot2)
+library(dplyr)
+library(forcats)
+library(tidyverse)
+library(cowplot)
+library(colorspace)
+library(ggrepel)
+library(tidyfit)
+```
+
+
+```{r}
+View(nyrr)
+warnings(nyrr)
+```
+
+
+The Year field needs to be converted to a factor so it's treated correctly. 
+
+```{r}
+NYRR <- nyrr %>% mutate(Year = as.factor(Year))
+
+```
+
+```{r}
+summary(NYRR)
+```
+
+
+When I convert the pace numbers back from seconds to minutes, the median pace (all genders, all distances) is 9:28, while the average is slightly slower, at 9:54. The median is a 29:25 5K, while the average works out to a 30:45 5K, so just above the Couch25K threshold in letter, though right there in spirit. The IQR boundaries are 8:13 and 11:02, and the IQR itself is 2:34, which works out to the outlier range is 4:22 low and 14:53 high. 
+
+Since 4:22 pace is elite or sub-elite, depending on gender and distance, this suggests the data has a left skew when viewed in total. It remains to be seen if that pattern holds when looking at individual age groups or by gender. But it also suggests that if a full data set with the heavy a skew still has 14:53 as the upper outlier threshold, that this is going to show some notable gaps between reality and industry standards when the data gets sliced by age and/or gender. That's not unexpected, but it makes me wonder what the summary stats look like when segmented by the race distance.  
+
+Now I'm using the count function to get some frequencies.  
+
+```{r}
+count(NYRR, "Gender")
+```
+
+Women outnumber the men, and there is a small, but notable number of nonbinary entries. It's probably not enough to be statistically valid once the data is segmented, even just by race distance, but it's likely more than exists in other data sets out there. 
+
+I can dig in with more detail on ages later, but for now I'm going to start with Age Group, since that's how records and other race data is typically viewed. 
+
+```{r}
+count(NYRR, 'AgeGroup')
+```
+
+The bulk of the runners are in the 25-39 range, which is the bulk of the post-collegiate open runners. Masters runners are those 40 and older. 
+
+```{r}
+ggplot(NYRR, aes(x = AgeGroup)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Runners by Age Group", x = "Age Group", y = "Count") +
+  theme_minimal()
+```
+
+When you look at the bar chart, it's clear that there are very few runners younger than 20 and every group older than 25-29 is smaller than the one before it, with the numbers getting quite small once runners are older than 70. 
+
+Let's see how the overall pace data looks, without filtering for race distance. 
+
+```{r}
+NYRR %>%
+  ggplot(aes(AgeGroup, Pace)) +
+  geom_boxplot()
+```
+
+In general, this is showing more extreme upper outliers in the younger age groups, but higher medians and typical ranges in the older age groups, especially older than 65. The IQR really starts expanding over age 65. 
+
+Now, let's look at the races by distance. 
+
+```{r}
+count(NYRR, 'Distance')
+```
+
+
+```{r}
+ggplot(NYRR, aes(x = Age, y = Pace, color = Gender)) +
+  geom_point(size = .3) +                # Draw scatter plot points
+  geom_smooth(method = "lm") + # Add linear regression line
+  labs(
+    title = "Scatter Plot of Age vs. Pace",
+    x = "Age (Years)",
+    y = "Pace per Miles (Seconds)"
+  ) +
+  theme_minimal()
+```
+
+Nonbinary runners appear to get faster as they age, but that's likely a result of the sample size being so small. There are very few nonbinary runners in the older age groups, so if the few there are relatively fast, that could easily skew the line. 
+
+For men vs. women, the gap widens as the runners age, with women slowing more as they age. Runners who are older than 75 in 2025, the final year of this dataset, would have been 20 in 1970, which is the start of the first running boom and two years before Title IX opened more athletic opportunities to women. While women could participate in sports before Title IX, the opportunities were harder to come by and they still weren't allowed to register for all races. So the men in the oldest age groups had the opportunity to compete in high school cross-country and track, while many women probably did not.  
+
+```{r}
+ggplot(NYRR, aes(x = Age, y = Pace, color = Gender)) +
+  geom_point(color = "purple", size = 1) +                # Draw scatter plot points
+  facet_grid(Distance ~ Year) +  # Formula syntax: rows ~ columns
+  geom_smooth(method = "lm", color = "black") + # Add linear regression line
+  labs(
+    title = "Scatter Plot of Age vs. Pace",
+    x = "Age (Years)",
+    y = "Pace per Miles (Seconds)"
+  ) +
+  theme_minimal()
+```
+
+Here, we can see that pace gradually slows as runners age. 
+
+
+Still, violin plots are probably a better way to visualize this.
+
+```{r}
+
+NYRR %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+What's really interesting here is the shape of the mass of runners changes as they age. In the open age groups, the shape is basically a bell curve with a long tail and a tiny head of quite fast runners. That makes sense, since NYRR hosts several races that draw elite fields and all races have a strong sub-elite field. But most professional and aspiring professional runners retire as they hit the masters threshold. While that is starting to change, it's still uncommon enough that the numbers will be very tiny in a dataset this large. 
+
+However, the shape starts changing in the masters age groups. The tail starts getting longer and thicker, though the peak remains central. Then the peak starts shifting forward in the 60s age groups before beginning to migrate toward the back of the distribution in the oldest age groups. 
+
+One thing to note here is that 1,000 seconds is 16:40 pace when converted to minutes, the equivalent of 3.6 mph on a treadmill. The 50-54 age group is the first one with a tail wide enough to show visible color at that threshold and the peak of the 80+ age group is at that threshold. 
+
+The next two questions are how that changes when we segment by gender and when we segment by race distance. 
+
+To simplfy the analysis, I'm creating three new data frames, one for each distance. 
+
+
+```{r}
+nyrr5K <- NYRR %>% dplyr::filter(Distance == "5K")
+nyrr4M <- NYRR %>% dplyr::filter(Distance == "4M")
+nyrr10K <- NYRR %>% dplyr::filter(Distance == "10K")
+```
+
+```{r}
+summary(nyrr5K)
+```
+
+The median pace is 9:30, and the average is slightly slower, at 10:05. 
+
+Couch25K programs are designed to get people running for 30 minutes, but branded around 5Ks. That equates to a 9:39 pace or faster. So the median runner for NYRR 5K races is just barely beating that. 
+
+```{r}
+nyrr5K %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 580.6, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+580.6 seconds is the line for a sub-30 5K.  
+
+Couch25K is branded as a beginner program, though is often used by experienced runners working their way back from injury. Still, because training gains compound over time, it seems logical to assume that the median pace would be higher if we had some way to limit the pool to only runners with under 1 year of running experience/training. That indicates that a training program that was actually geared to getting beginning runners to finish a 5K would need to build to a longer total time running. The 75th percentile pace is 11:15, which is a 34:57 5K, suggesting that tweaking the program to go just 5 minutes more — perhaps another week, maybe two, of training, would make a difference. 
+
+To get the high outlier threshold of 15:55, runners would have to train to run 49:27, likely 50 minutes for simplicity of programming. A beginner program that built to that time and provided a couple of checkpoints along the way to allow faster runners to "graduate" early would serve many more people who want to participate in road races.
+
+Using the 75th and outlier thresholds from earlier, let's see how this shakes out for training programs geared to 35 minutes (677.4 seconds) and 50 minutes (967.7). 
+
+```{r}
+nyrr5K %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 580.6, color = "yellow", linetype = "dashed", linewidth = 1) +
+  geom_hline(yintercept = 677.4, color = "gray", linetype = "dashed", linewidth = 1) +
+  geom_hline(yintercept = 967.7, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+
+Here's a look at the 5K results by age group, with a line where the 30-minute finish time pace is. 
+
+```{r}
+
+nyrr5K %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  geom_hline(yintercept = 580.6, color = "yellow", linetype = "dashed", linewidth = 1) +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+The portion of each plot above the dotted yellow line are the runners who didn't finish in 30 minutes. It's a decent number. 
+
+5K races are often an entry-level race for new runners, so time limits often are geared to allow walkers to complete them. That makes the 5K a forgiving distance for slower runners. The 40-44 age group is the first one with a colored tail over the 1,000 seconds (16:40) threshold, and the 80+ age group has a colored tail at the 1,500 second (25 minutes) threshold. So it's not just that there are a lot of finishes after 30 minutes. Many of them are much later than that. 
+
+```{r}
+
+nyrr5K %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 580.6, color = "yellow", linetype = "dashed", linewidth = 1) +
+  geom_hline(yintercept = 677.4, color = "gray", linetype = "dashed", linewidth = 1) +
+  geom_hline(yintercept = 967.7, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+
+```
+
+The 75th percentile line gets a lot more people over the finish line because so many runners are finishing in that range, while the outlier line covers the bulk of the field, except in the oldest age groups. 
+
+Finding: A beginner-friendly running plan would train a runner to go for at least 35 minutes, and would be accesible to many more people if it took runners through to 50 minutes of running. 
+
+Additional Research Question: Are there significant numbers of beginner runners older than 70 or are these mostly longtime runners who have slowed with age? In the latter scenario, there is less need for a beginner-friendly program because these are experienced runners who are modifying their past training to accommodate age-related slowing. 
+
+The next question: How does this break down when we divide by gender, not age group? 
+
+```{r}
+
+nyrr5K %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 580.6, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+
+```
+
+Men are the only gender where a majority of the field finishes in under 30 minutes. Because they account for slightly more than half the field, that explains why the median finish time is just under 30 minutes. 
+
+I'm going to make data frames by gender to simplify some of the analysis. 
+
+```{r}
+nyrr5KW <- nyrr5K %>% dplyr::filter(Gender == "W")
+nyrr5KM <- nyrr5K %>% dplyr::filter(Gender == "M")
+```
+
+```{r}
+summary(nyrr5KW)
+```
+
+The median pace for women is 10:12 and the average is just shy of 10:52. 
+
+```{r}
+nyrr5KM %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+```{r}
+nyrr5KW %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+
+```{r}
+tally(nyrr5K)
+```
+This is the total number of 5K finishes.
+
+And here is how many finish in under 30 minutes
+
+```{r}
+nyrr5K %>% 
+  filter(Time < 3001) %>% 
+  tally()
+```
+
+```{r}
+nyrr5K %>% 
+  filter(Gender == "M") %>% 
+  tally()
+```
+
+This is how many men are in the 5K field.
+
+And here is how many men finish in under 30 minutes. 
+
+```{r}
+nyrr5K %>% 
+  filter(Time < 3001, Gender == "M") %>% 
+  tally()
+```
+
+
+The 10K races are serving an extra purpose in this research because NYRR uses a 10K equivalent pace to set corral placements. So the next industry standard to examine will come here, looking at how a field of all the 10K race entries would be broken up in each corral. Before we get there, though, here is the breakdown of the 10K field overall: 
+
+```{r}
+summary(nyrr10K)
+```
+
+The median pace is the same as for 5K races, at 9:30, while the average is slightly faster, at 9:52. The Mini and Queens 10K races are two of the organization's marquee races and the Mini draws an elite field, so that might contribute a bit to a lower average pace with more elite and sub-elite runners lowering it. Again, the 25th percentile slows, down to 8:19. The 75th percentile is 11:00, which is something to come back to in a minute. 
+
+```{r}
+tally(nyrr10K)
+```
+
+```{r}
+nyrr10K %>% 
+  filter(Pace < 697) %>% 
+  tally()
+```
+
+
+```{r}
+nyrr10K %>% 
+  filter(Gender == "M") %>% 
+  tally()
+```
+
+
+```{r}
+nyrr10K %>% 
+  filter(Pace < 697, Gender == "M") %>% 
+  tally()
+```
+
+```{r}
+151227-123389
+```
+
+
+```{r, fig.width=8, fig.height=9}
+
+# Define custom boundaries
+corrals <- c(390, 423, 448, 472, 492, 513, 536, 560, 591, 630, 696, 1500)
+
+
+# Build the ggplot histogram
+ggplot(nyrr10K, aes(x = Pace)) +
+  geom_histogram(breaks = corrals, fill = "seagreen", color = "white", stat = "bin") +
+  stat_bin(breaks = corrals, aes(label = after_stat(count)), 
+           geom = "text_repel", 
+           vjust = -0.5,
+           box.padding = unit(0.5, "lines")) +
+  scale_x_continuous(breaks = corrals) + # Aligns axis labels with bin edges
+  labs(title = "NYRR 10K finishes by corral pace")
+  
+
+```
+
+One note: Because the AA, or sub-elite, corral has different cutoffs depending on gender, I combined all the AA and A runners into a single bin. Even with that, it's the smallest of the 12 groups by far. 
+
+Beyond that, you can see that in each slower corral, more runners are placed there, with significantly more in the final corral — all runners with a best pace of 11:37 or slower — than in the earlier ones. That corral actually has a slightly slower threshold than it did at one point. It used to be 11:30. Still, the notably higher count in that final bin suggests that the final corral might benefit from a different threshold, or the organization might benefit from adding one more corral. It also has by far the widest range of possible paces. 
+
+```{r}
+result <- quantile(nyrr10K$Pace, c(0.815))
+print(result)
+```
+
+
+If the point of corrals is to ensure that runners are placed with people of roughly similar paces, placing almost 20 percent of runners into a single corral that has a range of paces that stretches more than 13 minutes/mile seems counterproductive to that, especially when the total field divided by the numbers of corrals suggests between 8 and 8.5 percent would be in each. Since these standards are fixed, that distribution is impossible to ensure for every race, or even for a large collection of races, but there is a lot of room between the current distribution and an ideal distribution. 
+
+Here's what the field looks like with equal-sized bins: 
+
+```{r}
+# 1. Define the number of bins you want (e.g., 5 equal-count bins)
+k <- 12
+
+# 2. Calculate custom breaks based on quantiles (0 to 1)
+bin_breaks <- quantile(nyrr10K$Pace, probs = seq(0, 1, length.out = k + 1))
+
+# 3. Create the equal-count histogram
+ggplot(nyrr10K, aes(x = Pace)) +
+  geom_histogram(breaks = bin_breaks, fill = "seagreen", color = "white") +
+  scale_x_continuous(breaks = bin_breaks) +
+  theme_minimal() +
+  labs(
+    title = "NYRR 10K finishes in equal-sized corrals",
+    subtitle = paste("Data divided into", k, "bins with equal observations"),
+    x = "Value",
+    y = "Count"
+  )
+```
+
+Equal-width thresholds are:
+
+```{r}
+result <- quantile(nyrr10K$Pace, c(0.083, 0.167, 0.25, 0.333, 0.417, 0.5, 0.583, 0.667, 0.75, 0.833, 0.917, 1))
+print(result)
+```
+
+This probably goes too far the other direction, with the AA/A corral topping out at 7:15 instead of 6:29, but let's focus instead on the pace range in the subsequent corrals. 
+
+Corral B has a 36-second range
+C: 0:28
+D: 0:25
+E: 0:23
+F: 0:23
+G: 0:25
+H: 0:30
+I: 0:35
+J: 0:48 
+K: 1:19
+L: 14:43
+
+When the corrals are re-set to be equal distribution, the tails are the most affected. The cutoff to get into the fastest corral gets much slower, but after that the pace differential in each corral is pretty close, all the way to the end. But far fewer people end up in the final corral. It doesn't solve the challenge of people of wildly different paces being grouped together, but it at least has far fewer of them in there. One compromise solution would be to keep the first few corrals the same, then add Corrals M and N at the end, with the distribution for Corrals C-N being calculated using the above method. 
+
+```{r}
+result <- quantile(nyrr10K$Pace, c(0.077, 0.154, 0.231, 0.308, 0.385, 0.462, 0.538, 0.615, 0.692, 0.769, 0.846, 0.923, 1))
+print(result)
+```
+
+All of this points to one of the key points when looking at the road racing community as it exists now: The back of the pack has fewer runners spread out over more time, leading to far less density on course and a built-in argument against accommodation. 
+
+One thing we haven't looked at yet is how Athletes with Disabilities (AWD) fit into the picture. While race registrations don't show AWD status, the Achilles 4M race has more AWD than most races, so is a good point of comparison. 
+
+Here are all NYRR 4M races. 
+
+```{r}
+summary(nyrr4M)
+```
+
+4 miles is a common distance for NYRR races because of the way Central Park's main loop is designed, but it's not a standard distance for running. All the key data points are just slightly faster than for the 5K races, with the exception of the floor. That makes some sense as the fastest runners are bounded by the limits of human endurance so there is only so fast they can get at shorter distances. It makes sense that is the main data point that would slow as race distances increase. They actually most resemble the summary stats for the 10K races. 
+
+
+```{r}
+
+nyrr4M %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+```{r}
+count(nyrr4M, 'Race')
+```
+
+
+```{r}
+nyrrAchilles <- nyrr4M %>% dplyr::filter(Race == "Hope")
+summary(nyrrAchilles)
+```
+For all 4-mile races, the 25th percentile is 8:13 and the 75th percentile is 10:56 The median pace is 9:24 and the mean is 9:51. When we look just at the 27,114 entries in the Achilles race over the four years, all of those paces slow: The 25th percentile is 8:32 and the 75th percentile is 11:34, almost at the cutoff for the final NYRR corral. That would put a quarter of the participants in this race in a single corral of 12. The median pace is 9:49 and the mean is 10:27. The threshold between Corrals I and J is 9:51, so half the field for this race is lumped into four of 12 corrals.  
+
+```{r}
+nyrrAchilles %>% 
+  filter(Pace > 825) %>% 
+  tally()
+```
+
+
+```{r}
+nyrrAchilles %>% 
+  filter(Pace <= 825) %>% 
+  tally()
+```
+```{r}
+2913/27114
+```
+
+When we consider the 13:45 pace threshold, a larger share of Achilles race finishes are slower than that compared to all races: 10.7 percent vs. 7.3 percent
+
+```{r}
+nyrr4M %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 825, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+
+```{r}
+nyrrAchilles %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 825, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+```{r}
+nyrrAchilles %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  geom_hline(yintercept = 825, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+Beyond that, we can look at the entire dataset to see how the 13:45 pace that shows up in RRCA and other common training materials compares to the actual road racing community. 
+
+13:45 pace is 825 seconds. 
+
+```{r}
+NYRR %>% 
+  filter(Pace > 825) %>% 
+  tally()
+```
+
+```{r}
+NYRR %>% 
+  filter(Pace <= 825) %>% 
+  tally()
+```
+
+```{r}
+33734/459812
+```
+
+```{r}
+NYRR %>% 
+  filter(Age >= 70) %>% 
+  tally()
+```
+
+```{r}
+NYRR %>% 
+  filter(Age < 70) %>% 
+  tally()
+```
+```{r}
+nyrr60 <- NYRR %>% dplyr::filter(Age >= 60)
+nyrryounger <- NYRR %>% dplyr::filter(Age < 60)
+
+```
+
+```{r}
+count(nyrr60, "Gender")
+count(nyrryounger, "Gender")
+```
+
+
+
+```{r}
+nyrr4older <- nyrr4M %>% dplyr::filter(Age >= 60)
+nyrr4younger <- nyrr4M %>% dplyr::filter(Age < 60)
+```
+
+```{r}
+tally(nyrr4older)
+```
+
+
+```{r}
+count(nyrr4older, "AgeGroup")
+```
+```{r}
+nyrr4older %>% 
+  filter(Pace >= 825) %>% 
+  tally()
+```
+```{r}
+nyrr4younger %>% 
+  filter(Pace >= 825) %>% 
+  tally()
+```
+
+
+
+```{r}
+nyrr4older %>% 
+  filter(Pace < 825) %>% 
+  tally()
+```
+```{r}
+nyrr4younger %>% 
+  filter(Pace < 825) %>% 
+  tally()
+```
+
+
+```{r}
+NYRR %>%
+  ggplot(aes(AgeGroup, Pace, fill=AgeGroup)) +
+  geom_violin() +
+  geom_hline(yintercept = 825, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("AgeGroup") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+```{r}
+NYRR %>%
+  ggplot(aes(Gender, Pace, fill=Gender)) +
+  geom_violin() +
+  geom_hline(yintercept = 825, color = "black", linetype = "dashed", linewidth = 1) +
+  xlab("Gender") +
+  theme(legend.position="none") +
+  xlab("")
+```
+
+
+
+
+
+
